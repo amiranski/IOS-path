@@ -153,3 +153,135 @@ let petr = Person(name:"Petr", car: skoda)
 printEnginePower(ofPerson: petr)
 let james = Person(name: "James", car: nil)
 printEnginePower(ofPerson: james)
+
+protocol Coach{
+    var name: String {get}
+    func blowWhistle()
+    func conductPractice()
+}
+struct HockeyCoach: Coach {
+    var name: String
+    func blowWhistle(){
+        print("Feeew! Everebody skate!")
+    }
+    func conductPractice(){
+        print("Training shots, 1 vs 1 drils, powerplay tactics")
+    }
+}
+protocol Driver {
+    func driveBus()
+}
+struct MultiTaskingCoach: Coach, Driver {
+    var name: String
+    func blowWhistle(){
+        print("Whistle!")
+    }
+    func conductPractice(){
+        print("Training session started")
+    }
+    func driveBus(){
+        print("I'm starting engine, we are going to road game")
+    }
+}
+extension Coach {
+    func motivateTeam(){
+        print("Let's go boys, we gona win!")
+       
+    }
+}
+
+protocol Account {
+    var balance: Double{ get }
+}
+struct Cash: Account {
+    var balance: Double
+}
+struct BankAccount: Account{
+    var balance: Double
+    var cardNumber: String
+}
+struct CryptoWallet: Account {
+    var balance: Double
+    var walletAddress: String
+}
+let allMyMoney: [Account] = [
+    Cash(balance: 150.0),
+    BankAccount(balance: 1250.0, cardNumber: "************"),
+    CryptoWallet(balance: 800.0, walletAddress: "0xABC")
+]
+var totalWealth = 0.0
+for account in allMyMoney{
+    totalWealth += account.balance
+}
+print(totalWealth)
+
+extension Double {
+    var m: Double{
+        return self
+    }
+    var km: Double{
+        return self * 1000.0
+    }
+    var cm: Double {
+        return self / 100.0
+    }
+}
+let marathon = 42.195.km
+let myHeight = 183.0.cm
+print(marathon)
+print(myHeight)
+
+extension String{
+    func printWithStars(){
+        print("***\(self)***")
+    }
+}
+let greeting = "Hello, world!"
+greeting.printWithStars()
+"Error of download".printWithStars()
+
+struct FootballCoach {
+    var name: String
+    var age: Int
+}
+extension FootballCoach: Coach{
+    func conductPractice() {
+        print("Kick a ball")
+    }
+    
+    func blowWhistle(){
+        print("Whistle!")
+    }
+    func conductTraining(){
+        print("Start warmup")
+    }
+}
+extension FootballCoach: Driver{
+    func driveBus(){
+        print("Driving to arena")
+    }
+}
+
+func printAnything<T>(value: T){
+    print("Your value: \(value)")
+    print("Done!")
+}
+printAnything(value: 100)
+printAnything(value: "Hello!")
+printAnything(value: 45.5)
+
+struct Box<Item>{
+    var content: Item
+}
+let intBox = Box(content:25)
+let stringBox = Box(content: "New sneakers")
+
+func checkEquality<T: Equatable>(first: T, second: T){
+    if first == second{
+        print("They are equal")
+    }else{
+        print("They are different")
+    }
+}
+checkEquality(first: 10, second: 10)
+checkEquality(first: "A", second: "B")
