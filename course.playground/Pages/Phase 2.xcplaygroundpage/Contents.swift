@@ -285,3 +285,96 @@ func checkEquality<T: Equatable>(first: T, second: T){
 }
 checkEquality(first: 10, second: 10)
 checkEquality(first: "A", second: "B")
+
+enum ATMError: Error {
+    case invalidPin
+    case insufficientFunds(shortage: Double)
+    case machineOutOfCash
+}
+func withdrawCash(amount: Double, pin: String, accountBalance: Double) throws -> Double{
+    if pin != "1234"{
+        throw ATMError.invalidPin
+    }
+    if amount > accountBalance{
+        let missingMoney = amount - accountBalance
+        throw ATMError.insufficientFunds(shortage: missingMoney)
+    }
+    let newBalance = accountBalance - amount
+    return newBalance
+}
+let myBalance = 1000.0
+do {
+    let balanceAfterWithdrawal = try withdrawCash(amount: 1500, pin: "1234", accountBalance: myBalance)
+    print("Success! Take your money. Your available balance: \(balanceAfterWithdrawal)")
+} catch ATMError.invalidPin{
+    print("Incorrect PIN. Try again")
+} catch ATMError.insufficientFunds(let shortage){
+    print("Error: Not enough money on your account. Your missing amount: \(shortage)")
+} catch {
+    print("Unknown error")
+}
+let result = try? withdrawCash(amount: 500, pin: "0000", accountBalance: 1000)
+if result != nil{
+    print("Take money")
+} else {
+    print("Something went wrong")
+}
+let forceResult = try! withdrawCash(amount: 10, pin: "1234", accountBalance: 99999)
+print(forceResult)
+
+enum GameError: Error{
+    case invalidInput
+}
+func choiceCheck(choice: String) throws -> String {
+    if choice == "p" || choice == "s" || choice == "r"{
+        return "Good move"
+    }else {
+        throw GameError.invalidInput
+    }
+}
+let myMove = "r"
+do {
+   let result =  try choiceCheck(choice: myMove)
+    print(result)
+}catch GameError.invalidInput{
+    print("""
+        Enter exactly "p", "s" or "r"
+        """)
+} catch {
+    print("unknownError")
+}
+
+enum PlayerAccess: Error{
+    case youngAge(shortage: Int)
+    case missingItem(item: Set<String>)
+    case injury
+}
+func iceAccess (age: Int, injury: Bool, equipment: [String]) throws -> String{
+    if age < 5{
+        let missingYears = abs(age - 5)
+        throw PlayerAccess.youngAge(shortage: missingYears)
+    }
+    if injury {
+        throw PlayerAccess.injury
+    }
+    let requiredEquipment = ["helmet", "skates", "elbows", "shoulders", "pants", "pats", "stick"]
+    if !Set(requiredEquipment).isSubset(of:Set(equipment)){
+        let missingItems = Set(requiredEquipment).subtracting(Set(equipment))
+        throw PlayerAccess.missingItem(item: missingItems)
+       
+    }
+    return "You are good to go"
+    }
+do {
+    let result = try iceAccess(age: 5, injury: false, equipment: ["skates", "elbows", "shoulders", "pants", "pats", "helmet", "stick"])
+    print(result)
+} catch PlayerAccess.youngAge(let shortage) {
+    print("You are \(shortage) year(s) younger than 5")
+} catch PlayerAccess.injury{
+    print("You are injured and not allowed to participate in trainings until doctor will approve")
+} catch PlayerAccess.missingItem(let items){
+    let itemsString = items.joined(separator: ", ")
+    print("You are missing \(itemsString) to participate on ice")
+}catch {
+    print("Something went wrong, ask your coach's approve to participate in training session")
+}
