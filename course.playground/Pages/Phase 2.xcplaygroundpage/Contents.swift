@@ -378,3 +378,118 @@ do {
 }catch {
     print("Something went wrong, ask your coach's approve to participate in training session")
 }
+
+enum NetworkError: Error{
+    case noInternet
+    case serverDown
+}
+func fetchMatchResult(hasInternet: Bool) -> Result<String, NetworkError>{
+    if !hasInternet {
+        return .failure(.noInternet)
+    }
+    return .success("We won! Game score 3:1")
+}
+let downloadStatus = fetchMatchResult(hasInternet: true)
+switch downloadStatus {
+case .success(let matchScore):
+    print("News: \(matchScore)")
+case .failure(let error):
+    print("Couldn't download data. Reason: \(error)")
+}
+let someResult = fetchMatchResult(hasInternet: false)
+do {
+    let text = try someResult.get()
+    print(text)
+}catch{
+    print("Error during unpacking: \(error)")
+}
+
+struct TelegramUser {
+    let name: String
+    var age: Int
+    var isOnline: Bool
+    let phoneNumber: String
+}
+var myProfile: TelegramUser = TelegramUser(name: "Amiran", age: 21, isOnline: true, phoneNumber: "+123456789")
+var friendProfile: TelegramUser = TelegramUser(name: "Alex", age:25, isOnline: false, phoneNumber: "+987654321")
+func sendMessage(to user: TelegramUser, text: String){
+    
+}
+
+struct BankAccountStruct {
+    static let bankName: String = "Global Bank"
+    @MainActor static var totalAccounts: Int = 0
+    var owner: String
+    var balance: Int
+    @MainActor init(owner: String, balance: Int){
+        self.owner = owner
+        self.balance = balance
+        BankAccountStruct.totalAccounts += 1
+    }
+    static func printBankRules(){
+        print("Rules of bank \(bankName): Do not give your personal information")
+    }
+    func showBalance(){
+        print("Balance of \(owner): $\(balance)")
+    }
+}
+let account1 = BankAccountStruct(owner: "Amiran", balance: 1000)
+let account2 = BankAccountStruct(owner: "Alex", balance: 500)
+account1.showBalance()
+account2.showBalance()
+BankAccountStruct.printBankRules()
+print("Total opened accounts: \(BankAccountStruct.totalAccounts)")
+
+class HockeyPlayer {
+    var name: String
+    var goals: Int
+    init(name: String, goals: Int){
+        self.name = name
+        self.goals = goals
+    }
+}
+let hockeyPlayerOne = HockeyPlayer(name: "Alex", goals: 10)
+let hockeyPlayerTwo = hockeyPlayerOne
+hockeyPlayerTwo.goals = 50
+print(hockeyPlayerOne.goals)
+
+class Team {
+    var teamName: String
+    var city: String
+    var isActive: Bool
+    
+    init(teamName: String, city: String, isActive: Bool){
+        self.teamName = teamName
+        self.city = city
+        self.isActive = isActive
+    }
+}
+
+struct TeamStats {
+    var teamName: String
+    var wins: Int
+    var losses: Int
+    var totalGames: Int {
+        return wins + losses
+    }
+}
+var myTeam = TeamStats(teamName: "Wolves", wins: 10, losses: 5)
+print(myTeam.totalGames)
+myTeam.wins = 15
+print(myTeam.totalGames)
+
+struct BankAccountApp {
+    var balanceInDollars: Double
+    var balanceInEuros: Double {
+        get {
+            return balanceInDollars * 0.9
+        }
+        set(newEuroAmount){
+            balanceInDollars = newEuroAmount / 0.9
+        }
+    }
+}
+var myAccount = BankAccountApp(balanceInDollars: 1000)
+print(myAccount.balanceInEuros)
+myAccount.balanceInEuros = 1800
+print(myAccount.balanceInDollars)
