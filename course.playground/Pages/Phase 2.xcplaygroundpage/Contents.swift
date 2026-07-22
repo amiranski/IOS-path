@@ -493,3 +493,80 @@ var myAccount = BankAccountApp(balanceInDollars: 1000)
 print(myAccount.balanceInEuros)
 myAccount.balanceInEuros = 1800
 print(myAccount.balanceInDollars)
+
+class Employee {
+    var name: String
+    init (name: String){
+        self.name = name
+    }
+    func doWork(){
+        print("\(name) is filling papers")
+    }
+}
+class Manager: Employee {
+    override func doWork(){
+        print("\(name) is giving tasks to team and drinking coffee")
+    }
+}
+let regularWorker = Employee(name: "Ivan")
+regularWorker.doWork()
+let boss = Manager(name: "Anna")
+boss.doWork()
+
+class ChatMessage {
+    var text: String
+    var sender: String
+    var isRead: Bool
+    var time: String
+    init (text: String, sender: String, isRead: Bool, time: String){
+        self.text = text
+        self.sender = sender
+        self.isRead = isRead
+        self.time = time
+    }
+    convenience init(text: String, sender: String){
+        self.init(text: text, sender: sender, isRead: false, time: "Right now")
+    }
+}
+let oldMessage = ChatMessage(text: "Hello", sender: "Adam", isRead: true, time: "Yesterday at 3 PM")
+let newMessage = ChatMessage(text: "How are you?", sender: "Adam")
+
+class Document {
+    var id: String
+    required init(id: String){
+        self.id = id
+    }
+}
+class CreditContract: Document {
+    var amount: Int
+    init(id: String, amount: Int){
+        self.amount = amount
+        super.init(id: id)
+    }
+    required init(id: String){
+        self.amount = 0
+        super.init(id: id)
+    }
+}
+
+class TelegramUsers {
+    var username: String
+    var age: Int
+    init?(username: String, age: Int){
+        if age < 0{
+            return nil
+        }
+        if username.isEmpty{
+            return nil
+        }
+        self.username = username
+        self.age = age
+    }
+}
+let goodUser = TelegramUsers(username: "Adam", age: 21)
+let badUser = TelegramUsers(username: "Alex", age: -5)
+if let unwrappedUser = goodUser{
+    print("User created successfully! Name: \(unwrappedUser.username)")
+} else {
+    print("Error: user isn't find")
+}
