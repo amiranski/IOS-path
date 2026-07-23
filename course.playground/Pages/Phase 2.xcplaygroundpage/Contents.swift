@@ -611,3 +611,112 @@ let document2: Doc = myMortgage
 let exactCredit = document1 as! CreditDoc
 print(exactCredit.creditAmount)
 //let wrongCredit = document2 as! CreditDoc
+
+class AudioPlayer {
+    var volume: Int = 50
+}
+
+var playerOnPhone = AudioPlayer()
+var playerOnMac = playerOnPhone // Копия НЕ создалась. Передалась ссылка на оригинал.
+
+playerOnMac.volume = 100 // Мы поменяли громкость через мак
+
+print(playerOnPhone.volume) // Выведет: 100
+
+final class SecurityManager {
+    func encryptPassword(_ pass: String) -> String{
+        return "super_secret_hash_\(pass)"
+    }
+}
+class Worker{
+    var name: String
+    init(name: String){self.name = name}
+    func doWork(){
+        print("\(name) id doing regular work")
+    }
+    final func calculateSalary(){
+        print("Salary transfered to bank account")
+    }
+}
+class Boss: Worker{
+    override func doWork(){
+        print("\(name) is drinking coffee and giving tasks")
+    }
+}
+
+class BofaAccount {
+    private var balance: Double = 0.0
+    func deposit (amount: Double){
+        if amount > 0{
+            balance += amount
+        }
+    }
+}
+let myBofaAccount = BofaAccount()
+myBofaAccount.deposit(amount: 100)
+class Wallet {
+    private(set) var money: Int = 500
+    func spend(amount: Int){
+        money -= amount
+    }
+}
+let myWallet = Wallet()
+print("I have: $\(myWallet.money)")
+
+enum OrderStatus {
+    case processing
+    case shipping
+    case delivered
+}
+var myOrder: OrderStatus = OrderStatus.processing
+myOrder = .shipping
+let currentStatus: OrderStatus = .shipping
+switch currentStatus {
+case .processing:
+    print("We are packing your delivery")
+case .shipping:
+    print("Delivery is on the way")
+case .delivered:
+    print("Order deliverd. Bon appetit!")
+}
+
+enum Planet: String{
+    case earth = "Earth"
+    case mars = "Mars"
+    case jupiter = "Jupiter"
+}
+let myPlanet = Planet.mars
+print(myPlanet.rawValue)
+
+enum LoginResult{
+    case success(userID: Int)
+    case failure(errorMessage: String)
+}
+let result1 = LoginResult.success(userID: 555)
+let result2 = LoginResult.failure(errorMessage: "Wrong password")
+switch result2{
+case .success(let id):
+    print("We found, your ID: \(id)")
+case .failure(let message):
+    print("Error of login: \(message)")
+}
+
+enum CoffeeSize: CaseIterable{
+    case small
+    case medium
+    case large
+}
+let totalSizes = CoffeeSize.allCases.count
+print("We have \(totalSizes) sizes of coffee cups")
+for size in CoffeeSize.allCases{
+    print("We are offering: \(size)")
+}
+
+enum Category: String, CaseIterable{
+    case sports = "Sport"
+    case movies = "Movie"
+    case news = "News"
+}
+for category in Category.allCases{
+    print("Botton of menu: \(category.rawValue)")
+}
