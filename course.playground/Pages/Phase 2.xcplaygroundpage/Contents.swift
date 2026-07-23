@@ -570,3 +570,44 @@ if let unwrappedUser = goodUser{
 } else {
     print("Error: user isn't find")
 }
+
+class Doc {
+    var id: String
+    init(id: String){self.id = id}
+}
+class CreditDoc: Doc {
+    var creditAmount: Int
+    init(id: String, creditAmount: Int){
+        self.creditAmount = creditAmount
+        super.init(id: id)
+    }
+}
+class MortgageContract: Doc {
+    var houseAddress: String
+    init(id: String, houseAddress: String){
+        self.houseAddress = houseAddress
+        super.init(id: id)
+    }
+}
+let myCredit = CreditDoc(id: "111", creditAmount: 5000)
+let myMortgage = MortgageContract(id: "222", houseAddress: "10122 Bespoke Rd")
+let allDocuments: [Doc] = [myCredit, myMortgage]
+let basicDoc = myCredit as Doc
+for document in allDocuments{
+    if document is MortgageContract {
+        print("Mortgage with number \(document.id) was find")
+    }else if document is CreditDoc {
+        print("It is credit contract")
+    }
+}
+let someDocument: Doc = myMortgage
+if let credit = someDocument as? CreditDoc {
+    print("Credit amount is: \(credit.creditAmount)")
+}else{
+    print("Error: it is not a credit contract")
+}
+let document1: Doc = myCredit
+let document2: Doc = myMortgage
+let exactCredit = document1 as! CreditDoc
+print(exactCredit.creditAmount)
+//let wrongCredit = document2 as! CreditDoc
