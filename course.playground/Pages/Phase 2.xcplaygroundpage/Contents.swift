@@ -720,3 +720,56 @@ enum Category: String, CaseIterable{
 for category in Category.allCases{
     print("Botton of menu: \(category.rawValue)")
 }
+
+class User{
+var name: String
+    var subscription: Subscription?
+    init(name: String){self.name = name}
+}
+var myProfile2: User? = User(name: "Alex")
+myProfile2 = nil
+class Subscription{
+    weak var owner: User?
+}
+var firstReference: User? = User(name: "Amiran")
+var secondReference = firstReference
+firstReference = nil
+secondReference = nil
+var jack: User? = User(name: "Jack")
+var premium: Subscription? = Subscription()
+jack?.subscription = premium
+premium?.owner = jack
+jack = nil
+premium = nil
+
+class Tenant{
+    var name: String
+    var apartment: Apartment?
+    init(name: String){self.name = name}
+}
+class Apartment {
+    weak var tenant: Tenant?
+}
+var ben: Tenant? = Tenant(name: "Ben")
+var myFlat: Apartment? = Apartment()
+ben?.apartment = myFlat
+myFlat?.tenant = ben
+ben = nil
+
+class BankClient{
+    var name: String
+    var creditCard: CreditCard?
+    init(name: String)
+    {self.name = name}
+}
+class CreditCard {
+    let number: Int
+    unowned let owner: BankClient
+    init(number: Int, owner: BankClient){
+        self.number = number
+        self.owner = owner
+    }
+}
+var client: BankClient? = BankClient(name: "Dima")
+client?.creditCard = CreditCard(number: 1234, owner: client!)
+client = nil
