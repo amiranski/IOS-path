@@ -823,3 +823,155 @@ class ProfileViewController{
 var screen: ProfileViewController? = ProfileViewController()
 screen?.fetchProfile()
 screen = nil
+
+class FitnessTracker {
+    var totalSteps: Int = 0{
+        willSet {
+            print("Attention! Steps will change soon. Now: \(totalSteps). Will be: \(newValue)")
+        }
+        didSet {
+            print("Steps are successfully updated! Before: \(oldValue). Now: \(totalSteps)\n")
+        }
+    }
+}
+let tracker = FitnessTracker()
+tracker.totalSteps = 100
+tracker.totalSteps = 250
+
+class ProfileView{
+    var nameLabelText: String = ""
+    var userName: String = "Guest"{
+        didSet {
+            nameLabelText = userName
+            print("UI automaticaly updated: now on the screen written '\(userName)'")
+        }
+    }
+}
+let screen2 = ProfileView()
+screen2.userName = "Alex"
+screen2.userName = "Adam"
+
+var health: Int = 100 {
+    didSet(oldHealth) {
+        if health > 100 {
+            print("Error: The health can not be bigger than 100!")
+            health = oldHealth
+        }
+    }
+}
+
+class Thermostat {
+    var temperature: Int = 20{
+        willSet (newTemperature){
+            print("Trying to set temperature to \(newTemperature)°C")
+        }
+        didSet(oldTemperature){
+            if (10...30).contains(temperature){
+                print("Success! Temperature was changed from \(oldTemperature)°C to \(temperature)°C")
+            }
+            else{
+                temperature = oldTemperature
+                print("Error! Not allowed value. Temperature was saved as old value \(temperature)°C")
+            }
+        }
+    }
+}
+let roomThermostat = Thermostat()
+roomThermostat.temperature = 24
+roomThermostat.temperature = 40
+roomThermostat.temperature = 15
+
+struct ShoppingCart {
+    var itemPrice: Double = 150.0
+    var shippingCost: Double = 20.0
+    var totalPrice: Double {
+            return itemPrice + shippingCost
+    }
+}
+let cart = ShoppingCart()
+print(cart.totalPrice)
+
+class BankAccount2 {
+    var balanceInUSD: Double = 100.0
+    var balanceInEUR: Double {
+        get {
+            return balanceInUSD * 0.9
+        }
+        set {
+            balanceInUSD = newValue / 0.9
+        }
+    }
+}
+let myAccount2 = BankAccount2()
+print(myAccount2.balanceInEUR)
+myAccount2.balanceInEUR = 180.0
+print(myAccount2.balanceInUSD)
+
+struct Square {
+    var sideLength: Double
+    var perimeter: Double {
+        get {
+            return sideLength * 4
+        }
+        set {
+            sideLength = newValue / 4
+        }
+    }
+}
+var a5 = Square(sideLength: 5.0)
+print(a5.perimeter)
+a5.perimeter = 100
+print(a5.sideLength)
+
+@propertyWrapper
+struct Capitalized {
+    private var text: String = ""
+    var wrappedValue: String {
+        get {
+            return text
+        }
+        set {
+            text = newValue.capitalized
+        }
+    }
+    init (wrappedValue: String){
+        self.wrappedValue = wrappedValue
+    }
+}
+struct User2 {
+    @Capitalized var firstName: String
+    @Capitalized var lastName: String
+}
+var myUser = User2(firstName: "alex", lastName: "smith")
+print(myUser.firstName)
+print(myUser.lastName)
+myUser.firstName = "john"
+print(myUser.firstName)
+
+@propertyWrapper
+struct Clamped {
+    private var value: Int
+    private let range: ClosedRange<Int>
+    init(wrappedValue: Int, _ range: ClosedRange<Int>){
+        self.range = range
+        self.value = min(max(wrappedValue, range.lowerBound), range.upperBound)
+    }
+    var wrappedValue: Int {
+        get {return value}
+        set {
+            value = min(max(newValue, range.lowerBound), range.upperBound)
+        }
+    }
+}
+
+struct SmartHome {
+    @Clamped(10...30) var temperature: Int = 20
+    @Clamped(0...100) var humidity: Int = 50
+}
+var myRoom = SmartHome()
+myRoom.temperature = 100
+print(myRoom.temperature)
+myRoom.humidity = -50
+print(myRoom.humidity)
+myRoom.temperature = 22
+print(myRoom.temperature)
