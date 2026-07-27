@@ -773,3 +773,53 @@ class CreditCard {
 var client: BankClient? = BankClient(name: "Dima")
 client?.creditCard = CreditCard(number: 1234, owner: client!)
 client = nil
+
+class Driver2 {
+    var name: String
+    var car: Car2?
+    init (name: String){
+        self.name = name
+        print("Driver \(name) entered to memory")
+    }
+    deinit{
+        print("Driver \(name) was deleted from memory")
+    }
+}
+
+class Car2 {
+    var model: String
+    weak var owner: Driver2?
+    init (model: String){
+        self.model = model
+        print("Car \(model) entered to memory")
+    }
+    deinit{
+        print("Car \(model) was deleted from memory")
+    }
+}
+var david: Driver2? = Driver2(name: "David")
+var audi: Car2? = Car2(model: "Audi S5")
+david?.car = audi
+audi?.owner = david
+david = nil
+audi = nil
+
+class ProfileViewController{
+    var userName: String = "Alex"
+    var onDataLoaded: (() -> Void)?
+    init(){
+        print("Profile screen was opened")
+    }
+    func fetchProfile(){
+        onDataLoaded = { [weak self] in
+            guard let self = self else { return }
+            print("Data was loaded for \(self.userName)")
+        }
+        }
+    deinit {
+        print("Profile screen was closed and deleted from memory")
+    }
+}
+var screen: ProfileViewController? = ProfileViewController()
+screen?.fetchProfile()
+screen = nil
