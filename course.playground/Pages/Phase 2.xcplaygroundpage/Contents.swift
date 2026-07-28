@@ -975,3 +975,78 @@ myRoom.humidity = -50
 print(myRoom.humidity)
 myRoom.temperature = 22
 print(myRoom.temperature)
+
+class ComplexMath{
+    init(){
+        print("Heavy computation started...(Wait 5 seconds)")
+    }
+    func calculate(){
+        print("Result: 42")
+    }
+}
+class MyScreen {
+    lazy var mathEngine = ComplexMath()
+    init(){
+        print("Screen is open")
+    }
+}
+let screen3 = MyScreen()
+screen3.mathEngine.calculate()
+
+@MainActor
+class ProfileScreen{
+    lazy var logoutButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Logout", for: .normal)
+        button.backgroundColor = .red
+        button.layer.cornerRadius = 10
+        print("Button 'Logout' was created in memory")
+        return button
+    }()
+    init(){
+        print("Profile screen was created")
+    }
+}
+let profile = ProfileScreen()
+print(profile.logoutButton.backgroundColor!)
+
+struct Player2 {
+    static let maxLevel: Int = 100
+    var name: String
+    var currentLevel: Int
+}
+print(Player2.maxLevel)
+var player1 = Player2(name: "Alex", currentLevel: 15)
+var player2 = Player2(name: "Max", currentLevel: 42)
+
+class MathUtility {
+    static func add(a: Int,b: Int) -> Int{
+        return a + b
+    }
+}
+let sum = MathUtility.add(a: 5,b: 10)
+print(sum)
+
+class Vehicle{
+    static func reportFactoryName(){
+        print("Made in main factory")
+    }
+    class func startEngine(){
+        print("Engine was started by regular key")
+    }
+    func openDoor(){
+        print("The door of this car is open")
+    }
+}
+class SportsCar: Vehicle{
+    override class func startEngine(){
+        print("Engine was started by start/stop button")
+    }
+    
+}
+Vehicle.reportFactoryName()
+SportsCar.reportFactoryName()
+Vehicle.startEngine()
+SportsCar.startEngine()
+let myHonda = Vehicle()
+myHonda.openDoor()
