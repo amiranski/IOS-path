@@ -22,8 +22,22 @@ struct Customer{
     let dateOfBirth: Date
     let email: String
     let phoneNumber: String
-    var card: Card?
+    private var card: Card?
+    func cardView(){
+        guard let safeCard = card else{
+            print("Customer has not a card yet")
+            return
+        }
+        print(safeCard)
+    }
     var appProfile: User?
+    func profileView(){
+        guard let safeProfile = appProfile else{
+            print("Customer has not a app profile yet")
+            return
+        }
+        print(safeProfile)
+    }
     var bankAccounts: [BankAccount] = []
     mutating func openAccount(newAccount: BankAccount){
         bankAccounts.append(newAccount)
@@ -43,6 +57,8 @@ class BankAccount {
     let accountNumber: String
     private var balance = 0.0
     var transactionHistory: [Transaction] = []
+    var closingDate: Date?
+    
     init(accountNumber: String ){
         self.accountNumber = accountNumber
     }
@@ -101,7 +117,14 @@ struct Card{
     struct Transaction{
         let amount: Double
         let date: Date
-        let transactionDescription: String
+        let transactionDescription: String?
+        func transactionDescriptionView(){
+            guard let safeDescription = transactionDescription else {
+                print("Transaction has not any description")
+                return
+            }
+            print(safeDescription)
+        }
         enum TransactionType {
             case income
             case expense
@@ -119,7 +142,7 @@ struct Employee {
     let middleName: String?
     var fullName: String{
         if let safeMiddleName = middleName{
-           return "\(firstName) \(safeMiddleName) \(lastName)"
+            return "\(firstName) \(safeMiddleName) \(lastName)"
         }else{
             return "\(firstName) \(lastName)"
         }
@@ -129,6 +152,13 @@ struct Employee {
     let email: String
     let phoneNumber: String
     let branch: BankBranch?
+    func showBranch(){
+        guard let safeBranch = branch else {
+            print("Employee has not a branch")
+            return
+        }
+        print(safeBranch)
+    }
 }
 struct BankBranch{
     let address: String
