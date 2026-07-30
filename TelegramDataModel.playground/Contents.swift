@@ -21,7 +21,7 @@ class Contact {
     }
     var isBlocked = false
     var username: String?
-    var profilePicture: Bool
+    var profilePictureURL: String?
     var stories: [Story] = []
     var hasActiveStories: Bool{
         return  stories.contains { story in
@@ -35,12 +35,11 @@ class Contact {
         case month
         case longTime
     }
-    init?(id: String, phoneNumber: String, localName: String?, registeredUser: User?, status: Status, profilePicture: Bool){
+    init?(id: String, phoneNumber: String, localName: String?, registeredUser: User?, status: Status){
             self.id = id
             self.phoneNumber = phoneNumber
             self.localName = localName
             self.registeredUser = registeredUser
-            self.profilePicture = profilePicture
             self.status = status
         }
         
@@ -51,7 +50,6 @@ class Contact {
                 localName: nil,
                 registeredUser: registeredUser,
                 status: .recently,
-                profilePicture: false
             )
             }
 
@@ -87,13 +85,29 @@ class Calls{
 
 final class User {
     private let id: String
-    private var password: String
-    var email: String
+    private var password: String?
+    var email: String?
     var name: String
-    var username: String
+    var username: String?
     var phoneNumber: String
     var bio: String?
-    var profilePicture: Bool
+    func showProfileBio(user: User){
+        guard let safeBio = user.bio else {
+            print(" ")
+            return
+        }
+       print(safeBio)
+    }
+    var profilePictureURL: String?
+    func showProfilePicture(user: User){
+        guard let safeProfilePicture = user.profilePictureURL else {
+            if let firstLetter = (user.name).first{
+                print("Default picture with \(firstLetter)")
+            }
+            return
+        }
+        print(safeProfilePicture)
+    }
     var emojiStatus: String?
     var stickers: [String] = []
     var stories: [Story] = []
@@ -105,14 +119,10 @@ final class User {
     }
     var isPremium = false
     private var settings: UserSettings
-    init?(id: String, name: String, username: String, phoneNumber: String, password: String, email: String, profilePicture: Bool, settings: UserSettings){
+    init?(id: String, name: String, phoneNumber: String, settings: UserSettings){
         self.id = id
         self.name = name
-        self.username = username
         self.phoneNumber = phoneNumber
-        self.password = password
-        self.email = email
-        self.profilePicture = profilePicture
         self.settings = settings
     }
     struct UserSettings{
@@ -148,6 +158,7 @@ class Chats{
     }
     var folders: [Folders] = []
     var chatType: ChatType
+    
     struct Message {
         enum MessageType{
             case text
@@ -166,7 +177,7 @@ class Chats{
         var mediaURL: String?
         var messageType: MessageType
         var isRead: Bool
-        var messageLong: Int
+        var messageLong: Int?
         let senderId: String
         var replyToMessageId: String?
         enum MessageStatus: Int {
@@ -192,4 +203,5 @@ struct Story{
     }
     let postedBy: String
     var sound: Bool
+    var caption: String?
 }
