@@ -7,11 +7,19 @@ struct Bank{
     var allATMs: [ATM] = []
     var allBranches: [BankBranch] = []
 }
+
+enum CustomerInitError: Error {
+    case wrongBankID
+    case wrongEmail(provided: String)
+    case wrongPhoneNumber(provided: String)
+    case wrongDateOfBirth(provided: Date)
+}
+
 struct Customer{
     let bankID: String
     let firstName: String
     let lastName: String
-    let middleName: String?
+    var middleName: String?
     var fullName: String{
         if let safeMiddleName = middleName{
            return "\(firstName) \(safeMiddleName) \(lastName)"
@@ -38,6 +46,30 @@ struct Customer{
         }
         print(safeProfile)
     }
+    init(bankID: String, firstName: String, lastName: String, phoneNumber: String, email: String, dateOfBirth: Date) throws {
+        if bankID.count != 10 {
+            throw CustomerInitError.wrongBankID
+        }
+        if !email.contains("@"){
+            throw CustomerInitError.wrongEmail(provided: email)
+        }
+        if phoneNumber.count != 10 || !phoneNumber.allSatisfy({ $0.isNumber }){
+            throw CustomerInitError.wrongPhoneNumber(provided: phoneNumber)
+        }
+        let calendar = Calendar.current
+        let today = Date()
+        if let eighteenYearsAgo = calendar.date(byAdding: .year, value: -18, to: today){
+            if dateOfBirth > eighteenYearsAgo {
+                throw CustomerInitError.wrongDateOfBirth(provided: dateOfBirth)
+            }
+        }
+        self.bankID = bankID
+        self.email = email
+        self.phoneNumber = phoneNumber
+        self.dateOfBirth = dateOfBirth
+        self.firstName = firstName
+        self.lastName = lastName
+    }
     var bankAccounts: [BankAccount] = []
     mutating func openAccount(newAccount: BankAccount){
         bankAccounts.append(newAccount)
@@ -53,6 +85,7 @@ struct User {
         return input == passwordHash
     }
     }
+
 class BankAccount {
     let accountNumber: String
     private var balance = 0.0
@@ -62,15 +95,32 @@ class BankAccount {
     init(accountNumber: String ){
         self.accountNumber = accountNumber
     }
-    func withdraw(amount: Double){
-        if amount > balance{
-           let missingAmount = abs(amount - balance)
-            print("You don't have enough money to withdraw this amount. MIssing amount is \(missingAmount)")
-        }else{
-            balance -= amount
-            print("Success! Your available balance: \(balance)")
-        }
+    enum WithdrawError: Error {
+        case atmOutOfMoney
+        case insufficientCash (possibleWithdraw: Double)
+        case wrongPIN
+        case insufficientFunds(shortage: Double)
     }
+    
+    func withdraw(amount: Double, PIN: String) throws {
+        var cashAmount = 1000000.0
+        if cashAmount <= 0 {
+            throw WithdrawError.atmOutOfMoney
+        }
+        if amount > cashAmount {
+            throw WithdrawError.insufficientCash(possibleWithdraw: cashAmount)
+        }
+        if PIN != Customer.card {
+            print("Wrong PIN. Please try again")
+            throw WithdrawError.wrongPIN
+        }
+        if amount > balance {
+            let shortage = amount - balance
+            throw WithdrawError.insufficientFunds (shortage: shortage)
+        }
+        balance -= amount
+    }
+  
     func transfer(){}
     func zelleTransfer(){}
 }
