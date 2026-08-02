@@ -95,38 +95,23 @@ class BankAccount {
     init(accountNumber: String ){
         self.accountNumber = accountNumber
     }
-    enum WithdrawError: Error {
-        case atmOutOfMoney
-        case insufficientCash (possibleWithdraw: Double)
-        case wrongPIN
+    enum AccountError: Error
+    {
         case insufficientFunds(shortage: Double)
     }
-    
-    func withdraw(amount: Double, PIN: String) throws {
-        var cashAmount = 1000000.0
-        if cashAmount <= 0 {
-            throw WithdrawError.atmOutOfMoney
-        }
-        if amount > cashAmount {
-            throw WithdrawError.insufficientCash(possibleWithdraw: cashAmount)
-        }
-        if PIN != Customer.card {
-            print("Wrong PIN. Please try again")
-            throw WithdrawError.wrongPIN
-        }
+    func withdraw(amount: Double) throws {
         if amount > balance {
             let shortage = amount - balance
-            throw WithdrawError.insufficientFunds (shortage: shortage)
+            throw AccountError.insufficientFunds(shortage: shortage)
         }
         balance -= amount
     }
-  
     func transfer(){}
     func zelleTransfer(){}
 }
 class CreditAccount: BankAccount{
     private var creditBalance: Double
-    override func withdraw(amount: Double){
+    override func withdraw(amount: Double) throws {
         creditBalance -= amount
         print("Success! Your  credit balance: \(creditBalance) ")
     }
@@ -147,7 +132,7 @@ struct Card{
     let cardNumber: String
     let cardExpiration: String
     let cardCVC: String
-    private var cardPIN: String
+   private var cardPIN: String
     init(cardNumber: String, cardExpiration: String, cardCVC: String){
         self .cardNumber = cardNumber
         self .cardExpiration = cardExpiration
@@ -156,6 +141,14 @@ struct Card{
     }
     mutating func changePIN(to newPIN: String){
         cardPIN = newPIN
+    }
+    func checkPIN(input: String) -> Bool{
+        if cardPIN == input{
+            return true
+        }
+        else {
+            return false
+        }
     }
     enum CardStatus {
         case active
@@ -218,4 +211,45 @@ struct ATM{
     let location: String
     let isFullService: Bool
     var cashAmount: Double
+    
+    enum ATMError: Error {
+        case atmOutOfMoney
+        case insufficientCash (possibleWithdraw: Double)
+        case wrongPIN
+    }
+    mutating func withdraw(amount: Double, PIN: String, card: Card, account: BankAccount) throws {
+        if cashAmount <= 0 {
+            throw ATMError.atmOutOfMoney
+        }
+        if amount > cashAmount {
+            throw ATMError.insufficientCash(possibleWithdraw: cashAmount)
+        }
+        if card.checkPIN(input: PIN) == false {
+            print("Wrong PIN. Please try again")
+            throw ATMError.wrongPIN
+        }
+        try account.withdraw(amount: amount)
+        cashAmount -= amount
+    }
 }
+
+var myCard = Card(cardNumber: "1111222233334444", cardExpiration: "12/28", cardCVC: "123")
+let myAccount = BankAccount(accountNumber: "123456789")
+ var streetATM = ATM(location: "Main Street", isFullService: true, cashAmount: 5000.0)
+do {
+    try streetATM.withdraw(amount: 100.0, PIN: "0000", card: myCard, account: myAccount)
+    print("Money were succesfully withdrawed")
+}
+catch ATM.ATMError.wrongPIN {
+    print("Wrong PIN. Please try again")
+}
+catch ATM.ATMError.atmOutOfMoney {
+   print("We apologize, ATM out of cash")
+}
+catch BankAccount.AccountError.insufficientFunds(let shortage){
+    print("Not enough money on your account, missing amount \(shortage)")
+}
+catch {
+    print("Error: \(error)")
+}
+
