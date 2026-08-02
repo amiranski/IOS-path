@@ -253,3 +253,30 @@ catch {
     print("Error: \(error)")
 }
 
+var dateComponents = DateComponents()
+dateComponents.year = 2000
+dateComponents.month = 12
+dateComponents.day = 12
+let customersBirthDate = Calendar.current.date(from: dateComponents)!
+do {
+    let myCustomer = try Customer (
+        bankID: "1234567890",
+        firstName: "Alex",
+        lastName: "Smith",
+        phoneNumber: "1234567890",
+        email: "example@example.com", dateOfBirth: customersBirthDate
+    )
+    print("Success! Customer \(myCustomer.fullName) successfully registered")
+} catch CustomerInitError.wrongBankID {
+    print("Error of registration: ID of bank has to have 10 symbols")
+} catch CustomerInitError.wrongEmail (let provided) {
+    print("Error of registration: Entered email '\(provided)' doesn't include '@'")
+} catch CustomerInitError.wrongPhoneNumber(let provided){
+    print("Error of registration: wrong phone nuber type ('\(provided)'")
+} catch CustomerInitError.wrongDateOfBirth (let provided){
+    print("Error of registration: Customer isn't 18 years. Date of birth: \(provided)")
+} catch {
+    print("Unknown error: \(error)")
+}
+
+
