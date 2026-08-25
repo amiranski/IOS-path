@@ -1050,3 +1050,58 @@ Vehicle.startEngine()
 SportsCar.startEngine()
 let myHonda = Vehicle()
 myHonda.openDoor()
+
+func calculateMaxLoad (weights: [Int], limit: Int) -> Int{
+    var currentWeight = 0
+    var carsAmount = 0
+    for carWeight in weights {
+        currentWeight += carWeight
+        if currentWeight > limit{
+            return carsAmount
+        }
+        carsAmount += 1
+    }
+    return carsAmount
+}
+let load = calculateMaxLoad (weights: [1500, 2000, 1800, 3000], limit: 4000)
+print(load)
+
+enum RegistrationError: Error {
+    case tooYoung
+    case tooOld
+}
+func registerPlayer(age: Int) throws {
+    if age < 5 {
+        throw RegistrationError.tooYoung
+    }
+    else if age > 16 {
+        throw RegistrationError.tooOld
+    }
+}
+do {
+    try registerPlayer(age: 4)
+    print("Successfuly registered!")
+} catch RegistrationError.tooYoung {
+    print("Player is younger than 5 years, sorry")
+} catch RegistrationError.tooOld {
+    print("Player is older than 16, sorry")
+} catch {
+    print("Unknown error: \(error)")
+}
+
+let rawUsernames: [String?] = ["Alex", nil, " ", "Mike2026", "", "John"]
+
+func filteredUsernames(rawUsernames: [String?]) -> [String]{
+    var filteredArray: [String] = []
+    for username in rawUsernames {
+        if let filteredUsername = username {
+            let cleanName = filteredUsername.trimmingCharacters(in: .whitespaces)
+            if !cleanName.isEmpty {
+                filteredArray.append(cleanName)
+            }
+        }
+    }
+    return filteredArray
+}
+let usernames = filteredUsernames(rawUsernames: rawUsernames)
+print(usernames)

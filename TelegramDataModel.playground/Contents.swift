@@ -1,10 +1,17 @@
 import UIKit
 
-@MainActor class Telegram {
-    private static var allUsers = 0
-    private static var allUsernames: [String] = []
-    private static var allIDs: [String] = []
+class Telegram {
+    nonisolated(unsafe) private static var allUsers = 0
+    nonisolated(unsafe) private static var allUsernames: [String] = []
+    nonisolated(unsafe) private static var allIDs: [String] = []
+    static func isUsernameTaken(username: String) -> Bool {
+        return allUsernames.contains(username)
+        }
+    static func addUsername(username: String){
+        allUsernames.append(username)
+    }
 }
+
 class Contact {
     private let id: String
     var phoneNumber: String
@@ -49,7 +56,7 @@ class Contact {
                 phoneNumber: phoneNumber,
                 localName: nil,
                 registeredUser: registeredUser,
-                status: .recently,
+                status: .recently
             )
             }
 
@@ -84,6 +91,15 @@ class Calls{
 }
 
 final class User {
+    enum UserInitError: Error{
+        case easyPassword
+        case wrongEmailFormat (provided: String)
+        case wrongPhoneNumberFormat (provided: String)
+        case existingUsername
+        case emptyName
+        case usernameWithSpaces
+    }
+    
     private let id: String
     private var password: String?
     var email: String?
@@ -119,10 +135,31 @@ final class User {
     }
     var isPremium = false
     private var settings: UserSettings
-    init?(id: String, name: String, phoneNumber: String, settings: UserSettings){
+    init(id: String, name: String, phoneNumber: String,password: String, email: String, username: String, settings: UserSettings) throws {
+        if Telegram.isUsernameTaken(username: username){
+            throw UserInitError.existingUsername
+        }
+          if !email.contains("@"){
+            throw UserInitError.wrongEmailFormat(provided: email)
+        }
+        if name.isEmpty {
+            throw UserInitError.emptyName
+        }
+        if username.contains(" "){
+            throw UserInitError.usernameWithSpaces
+        }
+        if phoneNumber.count != 10 || !phoneNumber.allSatisfy({ $0.isNumber }){
+                   throw UserInitError.wrongPhoneNumberFormat(provided: phoneNumber)
+               }
+        if password.count < 8 {
+            throw UserInitError.easyPassword
+        }
         self.id = id
         self.name = name
         self.phoneNumber = phoneNumber
+        self.password = password
+        self.email = email
+        self.username = username
         self.settings = settings
     }
     struct UserSettings{
@@ -160,6 +197,11 @@ class Chats{
     var chatType: ChatType
     
     struct Message {
+        enum MessageError: Error{
+            case emptyMessage
+            case longText
+            case hardVideo
+        }
         enum MessageType{
             case text
             case audio
@@ -179,6 +221,7 @@ class Chats{
         var isRead: Bool
         var messageLong: Int?
         let senderId: String
+        var mediaSizeMB: Double?
         var replyToMessageId: String?
         enum MessageStatus: Int {
             case sent = 1
@@ -186,12 +229,41 @@ class Chats{
             case read = 3
         }
         var messageStatus: MessageStatus
+        init(text: String?, mediaURL: String?, messageType: MessageType, senderId: String, mediaSizeMB: Double?, replyToMessageId: String?){
+            self.id = UUID().uuidString
+            self.date = Date()
+            self.text = text
+            self.mediaURL = mediaURL
+            self.messageType = messageType
+            self.senderId = senderId
+            self.mediaSizeMB = mediaSizeMB
+            self.replyToMessageId = replyToMessageId
+            self.isRead = false
+            self.messageStatus = .sent
+            self.messageLong = text?.count
+        }
     }
     var messages: [Message] = []
     
     init(chatType: ChatType, id: String){
         self.chatType = chatType
         self.id = id
+    }
+    
+    
+    func sendMessage(message: Message, sender: User) throws {
+        if message.text == nil  && message.mediaURL == nil {
+            throw Message.MessageError.emptyMessage
+        }
+        if let safeMessage = message.text{
+            if safeMessage.count > 4096 {
+                throw Message.MessageError.longText
+            }
+        }
+        if (message.mediaSizeMB ?? 0) > 2048 && message.messageType == .video && !sender.isPremium {
+            throw Message.MessageError.hardVideo
+        }
+        messages.append(message)
     }
 }
 
@@ -205,3 +277,49 @@ struct Story{
     var sound: Bool
     var caption: String?
 }
+
+var myUserSettings = User.UserSettings(isDarkModeEnabled: true, notificationsEnabled: true, whoCanSeeMyPhone: User.UserSettings.PrivacyLevel.contacts)
+
+do {
+    let myUser = try User(
+        id: "123456789",
+        name: "Alex",
+        phoneNumber: "1234567890",
+        password: "Alex2000",
+        email: "example@example.com",
+        username: "Alex",
+        settings: myUserSettings)
+    Telegram.addUsername(username: myUser.username ?? myUser.phoneNumber)
+    print("Welcome! '\(myUser.username ?? "No name")' successfully registered")
+    
+    let myContact = Contact(phoneNumber: "123456789")!
+    
+    let myChat = Chats(chatType: .privateChat(contact: myContact) ,id: "1234567890")
+    
+    let myMessage = Chats.Message(text: "Text", mediaURL: "hruief435", messageType: Chats.Message.MessageType.text, senderId: "r48492428", mediaSizeMB: 3000.0, replyToMessageId: nil)
+    
+    try myChat.sendMessage(message: myMessage, sender: myUser)
+    print("Message successfully sent and added to array")
+} catch User.UserInitError.easyPassword{
+    print("Password has include at least 8 symbols")
+} catch User.UserInitError.wrongEmailFormat(let provided){
+    print("Entered email \(provided) doesn't include '@'")
+} catch User.UserInitError.wrongPhoneNumberFormat(let provided){
+    print("Wrong phone number type: \(provided)")
+} catch User.UserInitError.existingUsername{
+    print("This username is taken, please try another")
+} catch User.UserInitError.emptyName{
+    print("Name can not be empty")
+} catch User.UserInitError.usernameWithSpaces{
+    print("Username can not include spaces")
+} catch Chats.Message.MessageError.emptyMessage{
+    print("Error: Message is empty")
+} catch Chats.Message.MessageError.longText {
+    print("Error: Text is too long")
+} catch Chats.Message.MessageError.hardVideo {
+    print("Error video is too hard")
+} catch {
+    print("Unknown error: \(error)")
+}
+
+
