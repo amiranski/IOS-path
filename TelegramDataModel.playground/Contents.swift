@@ -201,6 +201,8 @@ class Chats{
             case emptyMessage
             case longText
             case hardVideo
+            case userIsBlocked
+            case longVideoCircle
         }
         enum MessageType{
             case text
@@ -219,6 +221,7 @@ class Chats{
         var mediaURL: String?
         var messageType: MessageType
         var isRead: Bool
+        var durationSeconds: Int?
         var messageLong: Int?
         let senderId: String
         var mediaSizeMB: Double?
@@ -259,6 +262,15 @@ class Chats{
             if safeMessage.count > 4096 {
                 throw Message.MessageError.longText
             }
+        }
+        if case let .privateChat(contact) = chatType {
+            if contact.isBlocked{
+                throw Message.MessageError.userIsBlocked
+            }
+                
+        }
+        if message.messageType == .video && (message.durationSeconds ?? 0) > 60{
+            throw Message.MessageError.longVideoCircle
         }
         if (message.mediaSizeMB ?? 0) > 2048 && message.messageType == .video && !sender.isPremium {
             throw Message.MessageError.hardVideo
@@ -318,6 +330,10 @@ do {
     print("Error: Text is too long")
 } catch Chats.Message.MessageError.hardVideo {
     print("Error video is too hard")
+} catch Chats.Message.MessageError.userIsBlocked{
+    print("Error: User is blocked")
+} catch Chats.Message.MessageError.longVideoCircle{
+    print("Error: Video circle is longer than 60 seconds")
 } catch {
     print("Unknown error: \(error)")
 }
