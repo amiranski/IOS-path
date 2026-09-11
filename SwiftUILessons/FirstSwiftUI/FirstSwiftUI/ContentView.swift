@@ -1,31 +1,42 @@
 import SwiftUI
-
 struct ContentView: View {
-    @State private var currentTemp = 20
-    @State private var cityName = "Astana"
+    let cities = ["Astana", "Almaty", "London", "New York"]
     var body: some View {
-        VStack(spacing: 30){
-            Text("\(currentTemp)°C")
-                .font(.system(size: 60, weight: .bold))
-            Button(action: {
-                currentTemp += 1
-            }){
-                Text("Make more warm")
-                    .padding()
-                    .background(Color.orange)
-                    .foregroundStyle(.white)
-                    .cornerRadius(10)
+        NavigationStack {
+            List(cities, id: \.self) { city in
+                NavigationLink(value: city){
+                    Text(city)
+                        .font(.title2)
+                }
             }
-        }
-        VStack(spacing: 30){
-            Text("Weather in city: \(cityName)")
-                .font(.title)
-            TextField("Enter city", text: $cityName)
-                .textFieldStyle(.roundedBorder)
-                .padding()
+            .navigationTitle("Cities")
+            .navigationDestination(for: String.self) { selectedCity in
+                CityDetailView(cityName: selectedCity)
+            }
         }
     }
 }
+struct CityDetailView: View {
+    let cityName: String
+    var body: some View {
+        VStack {
+            Text("Weather in city:")
+                .font(.title2)
+            Text(cityName)
+                .font(.system(size: 50, weight: .bold))
+                .foregroundStyle(.blue)
+            HStack {
+                Image(systemName: "sun.max.fill")
+                    .foregroundStyle(.yellow)
+                Text("25°C")
+            }
+            .font(.largeTitle)
+        }
+        .navigationTitle(cityName)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 
 #Preview {
     ContentView()
