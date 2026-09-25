@@ -10,7 +10,8 @@ import SwiftUI
     struct ContentView: View {
         @State private var adam = ProfileData()
         @Environment(\.colorScheme) var colorScheme
-        @State private var showBanner = true 
+        @State private var isAddingSkill = false
+        @State private var showBanner = true
         var body: some View {
             NavigationStack {
                 GeometryReader{ geo in
@@ -43,6 +44,10 @@ import SwiftUI
                         Divider()
                         ScrollView{
                             VStack(spacing: 15){
+                                if showBanner{
+                                    BannerView(isVisible: $showBanner)
+                                        .transition(.scale)
+                                }
                                 ForEach(adam.skills, id: \.self){ skill in
                                     Text(skill)
                                         .font(.title2)
@@ -52,21 +57,59 @@ import SwiftUI
                         }
                     }
                 }
+                .toolbar{
+                    Button {
+                isAddingSkill = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+                .sheet(isPresented: $isAddingSkill){
+                    AddSkillSheet(profile: adam)
+                    }
         }
     }
 }
 
-struct BannerView{
+struct BannerView: View {
+    @Binding var isVisible: Bool
     var body: some View {
-        @Environment(\.dismiss) var dismiss
         HStack{
             Text("Hi, I'm learning Swift UI!")
             Button("Close"){
-                dismiss()
+                withAnimation{
+                    isVisible = false
+                }
             }
         }
     }
 }
+
+struct AddSkillSheet: View {
+    var profile: ProfileData
+    @State private var newSkillText = ""
+    @State private var showAlert = false
+    @Environment(\.dismiss) var dismiss
+    var body: some View {
+        VStack{
+            TextField("Add skill", text: $newSkillText)
+            Button("Save"){
+                if newSkillText.isEmpty{
+                    showAlert = true
+                } else {
+                    profile.skills.append(newSkillText)
+                    dismiss()
+                }
+            }
+        }
+        .alert("Error", isPresented: $showAlert){
+            Button("OK", role: .cancel){}
+        } message: {
+            Text("Pole can't be empty")
+        }
+    }
+}
+
 #Preview{
    ContentView()
 }
