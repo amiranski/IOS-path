@@ -7,11 +7,13 @@ import SwiftUI
         var isLookingForJob = true
         var skills = ["C#", "Swift UI basics", "Hockey"]
     }
+
     struct ContentView: View {
         @State private var adam = ProfileData()
         @Environment(\.colorScheme) var colorScheme
         @State private var isAddingSkill = false
         @State private var showBanner = true
+        
         var body: some View {
             NavigationStack {
                 GeometryReader{ geo in
@@ -50,7 +52,7 @@ import SwiftUI
                                 }
                                 ForEach(adam.skills, id: \.self){ skill in
                                     Text(skill)
-                                        .font(.title2)
+                                        .skillCardStyle()
                                     
                                 }
                             }
@@ -109,7 +111,21 @@ struct AddSkillSheet: View {
         }
     }
 }
-
+struct SkillCardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.title2)
+            .padding()
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+    }
+}
+extension View {
+    func skillCardStyle() -> some View {
+        self.modifier(SkillCardStyle())
+    }
+}
 #Preview{
    ContentView()
 }
