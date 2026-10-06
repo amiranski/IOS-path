@@ -32,6 +32,7 @@ struct DashboardView: View {
                     }
                 }
             }
+            .navigationTitle("Dashboard")
         }
     }
 }
