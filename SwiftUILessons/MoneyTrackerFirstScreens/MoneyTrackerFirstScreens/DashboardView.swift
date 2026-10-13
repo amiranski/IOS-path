@@ -52,6 +52,7 @@ struct DashboardView: View {
                 .background(Color(.systemGray6))
                 ScrollView{
                     VStack{
+                         
                         
                         ForEach(myTransactions.indices, id: \.self){ index in
                             let item = myTransactions[index]
