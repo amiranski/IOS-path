@@ -47,6 +47,7 @@ struct DashboardView: View {
                     }
                     Spacer()
                 }
+                
                 .padding(.horizontal, 30)
                 .padding(.bottom, 20)
                 .background(Color(.systemGray6))
